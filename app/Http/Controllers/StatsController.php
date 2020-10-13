@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Stats;
+use Illuminate\Support\Facades\DB;
 class StatsController extends Controller
 {
     /**
@@ -14,7 +15,8 @@ class StatsController extends Controller
     public function index()
     {
         //
-        return Stats::all();
+        return Stats::orderByDesc('created_at')
+        ->get();
 
     }
 
@@ -38,10 +40,17 @@ class StatsController extends Controller
     {
         //
         $stats = new Stats;
-        $stats->visitor = '000.000.000.000';
-        $stats->view = false;
-        $stats->click = false;
-        return $stats->save();
+        $stats->visitor = $request->ip;
+        $stats->view = $request->view;
+        $stats->click = $request->click;
+
+        if ($stats->save()) {
+            return response()->json([
+                'message'=>'Vizualização salva com sucesso'
+            ], 201);
+        }
+        
+    
     }
 
     /**
